@@ -1,38 +1,68 @@
 /*
-Copyright © 2024 NAME HERE <EMAIL ADDRESS>
+Copyright © 2024 Kevin Jiang <kevin@kevinjiang.dev>
 */
 package cmd
 
 import (
 	"fmt"
+	"strconv"
 
 	"github.com/spf13/cobra"
 )
 
 // BOOKCmd represents the BOOK command
 var BOOKCmd = &cobra.Command{
-	Use:   "BOOK",
-	Short: "Book a seat for the flight",
-	Long:  `This command can be used to book a seat on a flight for customers.`,
+	Use:   "BOOK <starting seat> <number of consecutive seats>",
+	Short: "Book seats for the flight",
+	Long: `This command can be used to book one or more seats on a flight for customers.
+	
+Example: ara BOOK A0 2
+
+Note: The command will attempt to book seats consecutively counting up from the starting seat, up to the specified number. It will fail if it exceeds the maximum range of seats.
+	`,
 	Run: func(cmd *cobra.Command, args []string) {
-		var seat = args[0]
-		// var num = args[1]
+		if len(args) < 2 {
+			fmt.Println("FAIL")
+			return
+		}
+
+		seat := args[0]
+
+		num, err := strconv.Atoi(args[1])
+		if err != nil {
+			fmt.Println("FAIL")
+			return
+		}
 
 		records, err := readData()
 		if err != nil {
 			fmt.Println("FAIL")
-			fmt.Println(err)
 			return
 		}
 
-		row, col := seatToIndex(seat)
-
-		if records[row][col] == "x" {
+		row, col, err := seatToIndex(seat)
+		if err != nil {
 			fmt.Println("FAIL")
 			return
 		}
 
-		records[row][col] = "x"
+		if records[row][col] == "x" {
+			fmt.Println("FAIL")
+			return
+		} else {
+			records[row][col] = "x"
+		}
+
+		if num > 1 {
+			for i := col + 1; i < col+num; i++ {
+				if i < len(records[row]) && records[row][i] != "x" {
+					records[row][i] = "x"
+				} else {
+					fmt.Println("FAIL")
+					return
+				}
+			}
+		}
 
 		err = writeData(records)
 		if err != nil {
@@ -47,14 +77,4 @@ var BOOKCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(BOOKCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// BOOKCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// BOOKCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }

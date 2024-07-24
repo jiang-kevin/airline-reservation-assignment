@@ -1,7 +1,11 @@
+/*
+Copyright © 2024 Kevin Jiang <kevin@kevinjiang.dev>
+*/
 package cmd
 
 import (
 	"encoding/csv"
+	"errors"
 	"os"
 )
 
@@ -43,8 +47,24 @@ func writeData(records [][]string) error {
 }
 
 // Converting characters to row/column numbers using ASCII values - 'A' = 65, '0' = 48
-func seatToIndex(seat string) (row int, col int) {
+func seatToIndex(seat string) (row int, col int, err error) {
+	if len(seat) > 2 {
+		err = errors.New("seat argument is too long")
+		return
+	}
+
 	row = int(seat[0] - 65)
 	col = int(seat[1] - 48)
+
+	if row < 0 || row > 20 {
+		err = errors.New("seat row must be between A and T")
+		return
+	}
+
+	if col < 0 || col > 8 {
+		err = errors.New("seat column must be between 0 and 8")
+		return
+	}
+
 	return
 }
