@@ -17,7 +17,7 @@ func main() {
 	viper.AddConfigPath(".")
 	err := viper.ReadInConfig()
 	if err != nil {
-		panic(fmt.Errorf("fatal error config file: %w", err))
+		fmt.Println("FAIL")
 	}
 
 	var data data.Data = data.AraData{}
