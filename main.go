@@ -7,6 +7,7 @@ import (
 	"fmt"
 
 	"github.com/jiang-kevin/airline-reservation-assignment/cmd"
+	"github.com/jiang-kevin/airline-reservation-assignment/data"
 	"github.com/spf13/viper"
 )
 
@@ -18,5 +19,12 @@ func main() {
 	if err != nil {
 		panic(fmt.Errorf("fatal error config file: %w", err))
 	}
-	cmd.Execute()
+
+	var data data.Data = data.AraData{}
+
+	rootCmd := cmd.RootCmd()
+	rootCmd.AddCommand(cmd.BookCmd(data))
+	rootCmd.AddCommand(cmd.CancelCmd(data))
+
+	cmd.Execute(rootCmd)
 }

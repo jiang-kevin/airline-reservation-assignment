@@ -1,4 +1,4 @@
-package util
+package data
 
 import (
 	"errors"
@@ -50,9 +50,11 @@ func TestSeatToIndex(t *testing.T) {
 		},
 	}
 
+	var data Data = AraData{}
+
 	for _, v := range tests {
 		t.Run(v.name, func(t *testing.T) {
-			row, col, err := SeatToIndex(v.seat)
+			row, col, err := data.SeatToIndex(v.seat)
 
 			if v.gotError != nil {
 				if err.Error() != v.gotError.Error() {

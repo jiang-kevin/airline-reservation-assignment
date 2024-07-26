@@ -1,7 +1,7 @@
 /*
 Copyright © 2024 Kevin Jiang <kevin@kevinjiang.dev>
 */
-package util
+package data
 
 import (
 	"encoding/csv"
@@ -11,7 +11,15 @@ import (
 	"github.com/spf13/viper"
 )
 
-func ReadData() (data [][]string, err error) {
+type Data interface {
+	ReadData() (data [][]string, err error)
+	WriteData(records [][]string) error
+	SeatToIndex(seat string) (row int, col int, err error)
+}
+
+type AraData struct{}
+
+func (d AraData) ReadData() (data [][]string, err error) {
 
 	filepath := viper.GetString("data_filename")
 
@@ -22,8 +30,8 @@ func ReadData() (data [][]string, err error) {
 	}
 	defer file.Close()
 
-	reader := csv.NewReader(file)
-	data, err = reader.ReadAll()
+	csvReader := csv.NewReader(file)
+	data, err = csvReader.ReadAll()
 	if err != nil {
 		return
 	}
@@ -31,18 +39,19 @@ func ReadData() (data [][]string, err error) {
 	return
 }
 
-func WriteData(records [][]string) error {
+func (d AraData) WriteData(records [][]string) error {
 
 	filepath := viper.GetString("data_filename")
 	file, err := os.Create(filepath)
 	if err != nil {
 		return err
 	}
+
 	defer file.Close()
 
-	writer := csv.NewWriter(file)
-	defer writer.Flush()
-	err = writer.WriteAll(records)
+	csvWriter := csv.NewWriter(file)
+	defer csvWriter.Flush()
+	err = csvWriter.WriteAll(records)
 	if err != nil {
 		return err
 	}
@@ -51,7 +60,7 @@ func WriteData(records [][]string) error {
 }
 
 // Converting characters to row/column numbers using ASCII values - 'A' = 65, '0' = 48
-func SeatToIndex(seat string) (row int, col int, err error) {
+func (d AraData) SeatToIndex(seat string) (row int, col int, err error) {
 	if len(seat) > 2 {
 		row = -1
 		col = -1
