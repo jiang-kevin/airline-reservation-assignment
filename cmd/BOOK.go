@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/jiang-kevin/airline-reservation-assignment/util"
+
 	"github.com/spf13/cobra"
 )
 
@@ -34,13 +36,13 @@ Note: The command will attempt to book seats consecutively counting up from the 
 			return
 		}
 
-		records, err := readData()
+		records, err := util.ReadData()
 		if err != nil {
 			fmt.Println("FAIL")
 			return
 		}
 
-		row, col, err := seatToIndex(seat)
+		row, col, err := util.SeatToIndex(seat)
 		if err != nil {
 			fmt.Println("FAIL")
 			return
@@ -64,7 +66,7 @@ Note: The command will attempt to book seats consecutively counting up from the 
 			}
 		}
 
-		err = writeData(records)
+		err = util.WriteData(records)
 		if err != nil {
 			fmt.Println("FAIL")
 			fmt.Println(err)

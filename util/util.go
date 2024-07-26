@@ -1,18 +1,22 @@
 /*
 Copyright © 2024 Kevin Jiang <kevin@kevinjiang.dev>
 */
-package cmd
+package util
 
 import (
 	"encoding/csv"
 	"errors"
 	"os"
+
+	"github.com/spf13/viper"
 )
 
-func readData() (data [][]string, err error) {
+func ReadData() (data [][]string, err error) {
 
-	filepath := "data.txt"
+	filepath := viper.GetString("data_filename")
+
 	file, err := os.Open(filepath)
+
 	if err != nil {
 		return
 	}
@@ -27,9 +31,9 @@ func readData() (data [][]string, err error) {
 	return
 }
 
-func writeData(records [][]string) error {
+func WriteData(records [][]string) error {
 
-	filepath := "data.txt"
+	filepath := viper.GetString("data_filename")
 	file, err := os.Create(filepath)
 	if err != nil {
 		return err
@@ -47,8 +51,10 @@ func writeData(records [][]string) error {
 }
 
 // Converting characters to row/column numbers using ASCII values - 'A' = 65, '0' = 48
-func seatToIndex(seat string) (row int, col int, err error) {
+func SeatToIndex(seat string) (row int, col int, err error) {
 	if len(seat) > 2 {
+		row = -1
+		col = -1
 		err = errors.New("seat argument is too long")
 		return
 	}
@@ -56,13 +62,13 @@ func seatToIndex(seat string) (row int, col int, err error) {
 	row = int(seat[0] - 65)
 	col = int(seat[1] - 48)
 
-	if row < 0 || row > 20 {
+	if row < 0 || row > 19 {
 		err = errors.New("seat row must be between A and T")
 		return
 	}
 
-	if col < 0 || col > 8 {
-		err = errors.New("seat column must be between 0 and 8")
+	if col < 0 || col > 7 {
+		err = errors.New("seat column must be between 0 and 7")
 		return
 	}
 
